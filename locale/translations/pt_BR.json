@@ -35,6 +35,7 @@
     "menu.mark_page_as_read": "Marcar essa página como lída",
     "menu.mark_all_as_read": "Marcar todos como lido",
     "menu.show_all_entries": "Mostrar todas os itens",
+    "menu.show_starred_entries": "Mostrar entradas com estrela",
     "menu.show_only_unread_entries": "Mostrar apenas itens não lidos",
     "menu.refresh_feed": "Atualizar",
     "menu.refresh_all_feeds": "Atualizar todas as fontes",

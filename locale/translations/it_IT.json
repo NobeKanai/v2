@@ -35,6 +35,7 @@
     "menu.mark_page_as_read": "Segna questa pagina come letta",
     "menu.mark_all_as_read": "Segna tutti gli articoli come letti",
     "menu.show_all_entries": "Mostra tutte le voci",
+    "menu.show_starred_entries": "Mostra voci speciali",
     "menu.show_only_unread_entries": "Mostra solo voci non lette",
     "menu.refresh_feed": "Aggiorna",
     "menu.refresh_all_feeds": "Aggiorna tutti i feed in background",

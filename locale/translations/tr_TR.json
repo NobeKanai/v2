@@ -35,6 +35,7 @@
     "menu.mark_page_as_read": "Bu sayfayı okundu olarak işaretle",
     "menu.mark_all_as_read": "Tümünü okundu olarak işaretle",
     "menu.show_all_entries": "Tüm iletileri göster",
+    "menu.show_starred_entries": "Yıldızlı girişleri göster",
     "menu.show_only_unread_entries": "Sadece okunmamış iletileri göster",
     "menu.refresh_feed": "Yenile",
     "menu.refresh_all_feeds": "Tüm beslemeleri arka planda yenile",

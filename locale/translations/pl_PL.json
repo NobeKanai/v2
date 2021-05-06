@@ -35,6 +35,7 @@
     "menu.mark_page_as_read": "Oznacz jako przeczytane",
     "menu.mark_all_as_read": "Oznacz wszystko jako przeczytane",
     "menu.show_all_entries": "Pokaż wszystkie artykuły",
+    "menu.show_starred_entries": "Pokaż wpisy oznaczone gwiazdką",
     "menu.show_only_unread_entries": "Pokaż tylko nieprzeczytane artykuły",
     "menu.refresh_feed": "Odśwież",
     "menu.refresh_all_feeds": "Odśwież wszystkie subskrypcje w tle",
