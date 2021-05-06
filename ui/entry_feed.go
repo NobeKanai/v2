@@ -56,8 +56,14 @@ func (h *handler) showFeedEntryPage(w http.ResponseWriter, r *http.Request) {
 
 	var unreadBefore *time.Time
 	showOnlyUnread := request.QueryBooleanParam(r, "unread")
+	showStarred := request.QueryBooleanParam(r, "starred")
 
-	entryPaginationBuilder := storage.NewEntryPaginationBuilder(h.store, user.ID, entry.ID, user.EntryDirection)
+	direction := user.EntryDirection
+	if showStarred {
+		direction = "desc"
+	}
+
+	entryPaginationBuilder := storage.NewEntryPaginationBuilder(h.store, user.ID, entry.ID, direction)
 	entryPaginationBuilder.WithFeedID(feedID)
 	if showOnlyUnread {
 		unreadBefore = request.QueryTimestampParam(r, "unreadBefore")
@@ -66,6 +72,8 @@ func (h *handler) showFeedEntryPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		entryPaginationBuilder.WithUnreadBefore(*unreadBefore)
+	} else if showStarred {
+		entryPaginationBuilder.WithStarred()
 	}
 
 	prevEntry, nextEntry, err := entryPaginationBuilder.Entries()
@@ -98,6 +106,7 @@ func (h *handler) showFeedEntryPage(w http.ResponseWriter, r *http.Request) {
 	view.Set("hasSaveEntry", h.store.HasSaveEntry(user.ID))
 	view.Set("showOnlyUnreadEntries", showOnlyUnread)
 	view.Set("unreadBefore", unreadBefore)
+	view.Set("showStarredEntries", showStarred)
 
 	html.OK(w, r, view.Render("entry"))
 }

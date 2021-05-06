@@ -31,6 +31,9 @@
         <li>
             <a href="{{ route "feedEntriesAll" "feedID" .feed.ID }}">{{ t "menu.show_all_entries" }}</a>
         </li>
+        <li>
+            <a href="{{ route "feedEntriesStarred" "feedID" .feed.ID }}">{{ t "menu.show_starred_entries" }}</a>
+        </li>
         {{ else }}
         <li>
             <a href="{{ route "feedEntries" "feedID" .feed.ID }}">{{ t "menu.show_only_unread_entries" }}</a>
@@ -78,7 +81,7 @@
                     {{ if ne .Feed.Icon.IconID 0 }}
                         <img src="{{ route "icon" "iconID" .Feed.Icon.IconID }}" width="16" height="16" loading="lazy" alt="{{ .Feed.Title }}">
                     {{ end }}
-                    <a href="{{ route "feedEntry" "feedID" .Feed.ID "entryID" .ID }}{{ buildQuery "unread" $.showOnlyUnreadEntries }}">{{ .Title }}</a>
+                    <a href="{{ route "feedEntry" "feedID" .Feed.ID "entryID" .ID }}{{ buildQuery "unread" $.showOnlyUnreadEntries "starred" $.showStarredEntries }}">{{ .Title }}</a>
                 </span>
                 <span class="category"><a href="{{ route "categoryEntries" "categoryID" .Feed.Category.ID }}">{{ .Feed.Category.Title }}</a></span>
             </div>
