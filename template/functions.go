@@ -15,6 +15,7 @@ import (
 	netUrl "net/url"
 
 	"miniflux.app/config"
+	"miniflux.app/crypto"
 	"miniflux.app/http/route"
 	"miniflux.app/locale"
 	"miniflux.app/model"
@@ -53,6 +54,9 @@ func (f *funcMap) Map() template.FuncMap {
 		"safeURL": func(url string) template.URL {
 			return template.URL(url)
 		},
+		"safeCSS": func(str string) template.CSS {
+			return template.CSS(str)
+		},
 		"noescape": func(str string) template.HTML {
 			return template.HTML(str)
 		},
@@ -77,6 +81,9 @@ func (f *funcMap) Map() template.FuncMap {
 		"contains": func(str, substr string) bool {
 			return strings.Contains(str, substr)
 		},
+		"replace": func(str, old, new string) string {
+			return strings.Replace(str, old, new, 1)
+		},
 		"isodate": func(ts time.Time) string {
 			return ts.Format("2006-01-02 15:04:05")
 		},
@@ -85,10 +92,13 @@ func (f *funcMap) Map() template.FuncMap {
 		},
 		"icon": func(iconName string) template.HTML {
 			return template.HTML(fmt.Sprintf(
-				`<svg class="icon" aria-hidden="true"><use xlink:href="%s#icon-%s"></svg>`,
+				`<svg class="icon" aria-hidden="true"><use xlink:href="%s#icon-%s"/></svg>`,
 				route.Path(f.router, "appIcon", "filename", "sprite.svg"),
 				iconName,
 			))
+		},
+		"nonce": func() string {
+			return crypto.GenerateRandomStringHex(16)
 		},
 
 		// These functions are overrode at runtime after the parsing.
