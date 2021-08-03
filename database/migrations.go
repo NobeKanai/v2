@@ -542,6 +542,9 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE entries ADD COLUMN read_at timestamp with time zone`
 		_, err = tx.Exec(sql)
+		_, err = tx.Exec(`
+			ALTER TABLE categories ADD COLUMN hide_globally boolean not null default false
+		`)
 		return err
 	},
 }

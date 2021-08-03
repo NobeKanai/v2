@@ -49,6 +49,7 @@ func (s *Storage) CountAllEntries() map[string]int64 {
 func (s *Storage) CountUnreadEntries(userID int64) int {
 	builder := s.NewEntryQueryBuilder(userID)
 	builder.WithStatus(model.EntryStatusUnread)
+	builder.WithGloballyVisible()
 
 	n, err := builder.CountEntries()
 	if err != nil {
@@ -372,6 +373,27 @@ func (s *Storage) markEntriesAsRead(userID int64, entryIDs []int64) error {
 	logger.Debug("[Storage:MarkFeedAsRead] %d items marked as read", count)
 
 	return nil
+}
+
+func (s *Storage) SetEntriesStatusCount(userID int64, entryIDs []int64, status string) (int, error) {
+	if err := s.SetEntriesStatus(userID, entryIDs, status); err != nil {
+		return 0, err
+	}
+
+	query := `
+		SELECT count(*)
+		FROM entries e
+		    JOIN feeds f ON (f.id = e.feed_id)
+		    JOIN categories c ON (c.id = f.category_id)
+		WHERE e.user_id = $1 AND e.id = ANY($2) AND NOT c.hide_globally
+	`
+	row := s.db.QueryRow(query, userID, pq.Array(entryIDs))
+	visible := 0
+	if err := row.Scan(&visible); err != nil {
+		return 0, fmt.Errorf(`store: unable to query entries visibility %v: %v`, entryIDs, err)
+	}
+
+	return visible, nil
 }
 
 // ToggleBookmark toggles entry bookmark value.
