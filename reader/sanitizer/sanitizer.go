@@ -206,25 +206,24 @@ func isPixelTracker(tagName string, attributes []html.Attribute) bool {
 	return false
 }
 
-func hasRequiredAttributes(tagName string, attributes []string) bool {
-	elements := make(map[string][]string)
-	elements["a"] = []string{"href"}
-	elements["iframe"] = []string{"src"}
-	elements["img"] = []string{"src"}
-	elements["source"] = []string{"src", "srcset"}
+var requiredAttributes = map[string][]string{
+	"a":      {"href"},
+	"iframe": {"src"},
+	"img":    {"src"},
+	"source": {"src", "srcset"},
+}
 
-	for element, attrs := range elements {
-		if tagName == element {
-			for _, attribute := range attributes {
-				for _, attr := range attrs {
-					if attr == attribute {
-						return true
-					}
+func hasRequiredAttributes(tagName string, attributes []string) bool {
+	if attrs, ok := requiredAttributes[tagName]; ok {
+		for _, attribute := range attributes {
+			for _, attr := range attrs {
+				if attr == attribute {
+					return true
 				}
 			}
-
-			return false
 		}
+
+		return false
 	}
 
 	return true
