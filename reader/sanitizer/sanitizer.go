@@ -167,11 +167,9 @@ func isValidTag(tagName string) bool {
 }
 
 func isValidAttribute(tagName, attributeName string) bool {
-	for element, attributes := range getTagAllowList() {
-		if tagName == element {
-			if inList(attributeName, attributes) {
-				return true
-			}
+	if attributes, ok := tagAllowList[tagName]; ok {
+		if inList(attributeName, attributes) {
+			return true
 		}
 	}
 
