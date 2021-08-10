@@ -38,6 +38,12 @@ var (
 func ProcessFeedEntries(store *storage.Storage, feed *model.Feed) {
 	var filteredEntries model.Entries
 
+	if feed.CustomScript != "" {
+		if err := rewriteEntries(feed); err != nil {
+			logger.Error("[Rewriter] Error occurred when rewrites feed %q with custom script: %v", feed.Title, err)
+		}
+	}
+
 	for _, entry := range feed.Entries {
 		logger.Debug("[Processor] Processing entry %q from feed %q", entry.URL, feed.FeedURL)
 

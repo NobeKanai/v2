@@ -40,6 +40,7 @@ type Feed struct {
 	Crawler                     bool      `json:"crawler"`
 	BlocklistRules              string    `json:"blocklist_rules"`
 	KeeplistRules               string    `json:"keeplist_rules"`
+	CustomScript                string    `json:"custom_script"`
 	UserAgent                   string    `json:"user_agent"`
 	Cookie                      string    `json:"cookie"`
 	Username                    string    `json:"username"`
@@ -136,6 +137,7 @@ type FeedCreationRequest struct {
 	RewriteRules                string `json:"rewrite_rules"`
 	BlocklistRules              string `json:"blocklist_rules"`
 	KeeplistRules               string `json:"keeplist_rules"`
+	CustomScript                string `json:"custom_script"`
 }
 
 // FeedModificationRequest represents the request to update a feed.
@@ -147,6 +149,7 @@ type FeedModificationRequest struct {
 	RewriteRules                *string `json:"rewrite_rules"`
 	BlocklistRules              *string `json:"blocklist_rules"`
 	KeeplistRules               *string `json:"keeplist_rules"`
+	CustomScript                *string `json:"custom_script"`
 	Crawler                     *bool   `json:"crawler"`
 	UserAgent                   *string `json:"user_agent"`
 	Cookie                      *string `json:"cookie"`
@@ -228,6 +231,10 @@ func (f *FeedModificationRequest) Patch(feed *Feed) {
 
 	if f.FetchViaProxy != nil {
 		feed.FetchViaProxy = *f.FetchViaProxy
+	}
+
+	if f.CustomScript != nil {
+		feed.CustomScript = *f.CustomScript
 	}
 }
 

@@ -21,6 +21,7 @@ require (
 	google.golang.org/appengine v1.6.6 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.0 // indirect
 	mvdan.cc/xurls/v2 v2.3.0
+	rogchap.com/v8go v0.6.0
 )
 
 go 1.16

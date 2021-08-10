@@ -28,6 +28,7 @@ type SubscriptionForm struct {
 	RewriteRules                string
 	BlocklistRules              string
 	KeeplistRules               string
+	CustomScript                string
 }
 
 // Validate makes sure the form values are valid.
@@ -73,5 +74,6 @@ func NewSubscriptionForm(r *http.Request) *SubscriptionForm {
 		RewriteRules:                r.FormValue("rewrite_rules"),
 		BlocklistRules:              r.FormValue("blocklist_rules"),
 		KeeplistRules:               r.FormValue("keeplist_rules"),
+		CustomScript:                r.FormValue("custom_script"),
 	}
 }

@@ -67,6 +67,8 @@
  
                 <label for="form-keeplist-rules">{{ t "form.feed.label.keeplist_rules" }}</label>
                 <input type="text" name="keeplist_rules" id="form-keeplist-rules" value="{{ .form.KeeplistRules }}" spellcheck="false">
+
+                <label>Custom Script</label><textarea name="custom_script" id="form-custom-script" cols="30" rows="10">{{ .form.CustomScript }}</textarea>
             </div>
         </details>
 

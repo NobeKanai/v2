@@ -89,6 +89,8 @@
         {{ end }}
         <label><input type="checkbox" name="disabled" value="1" {{ if .form.Disabled }}checked{{ end }}> {{ t "form.feed.label.disabled" }}</label>
 
+        <label>Custom Script</label><textarea name="custom_script" cols="30" rows="10">{{ if .form.CustomScript }}{{ .form.CustomScript }}{{ end }}</textarea>
+
         <div class="buttons">
             <button type="submit" class="button button-primary" data-label-loading="{{ t "form.submit.saving" }}">{{ t "action.update" }}</button> {{ t "action.or" }} <a href="{{ route "feeds" }}">{{ t "action.cancel" }}</a>
         </div>
