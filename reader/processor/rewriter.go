@@ -17,6 +17,7 @@ func rewriteEntries(feed *model.Feed) error {
 	var filteredEntries model.Entries
 
 	ctx, _ := v8go.NewContext(iso)
+	defer ctx.Close()
 
 	objJson, _ := json.Marshal(feed.Entries)
 	ctx.RunScript(fmt.Sprintf("let entries = %s;", objJson), "rewrite.js")
