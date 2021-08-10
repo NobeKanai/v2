@@ -8,7 +8,7 @@ RUN go build \
     -ldflags="-s -w -X 'miniflux.app/version.Version=`git describe --tags --abbrev=0`' -X 'miniflux.app/version.Commit=`git rev-parse --short HEAD`' -X 'miniflux.app/version.BuildDate=`date +%FT%T%z`'" \
     main.go
 
-FROM debian:stable
+FROM debian:stable-slim
 
 LABEL org.opencontainers.image.title=Miniflux
 LABEL org.opencontainers.image.description="Miniflux is a minimalist and opinionated feed reader"
