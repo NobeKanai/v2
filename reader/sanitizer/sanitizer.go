@@ -392,10 +392,6 @@ var tagAllowList = map[string][]string{
 	"wbr":        {},
 }
 
-func getTagAllowList() map[string][]string {
-	return tagAllowList
-}
-
 func inList(needle string, haystack []string) bool {
 	for _, element := range haystack {
 		if element == needle {
