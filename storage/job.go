@@ -6,6 +6,7 @@ package storage // import "miniflux.app/storage"
 
 import (
 	"fmt"
+	"math/rand"
 
 	"miniflux.app/config"
 	"miniflux.app/model"
@@ -45,6 +46,45 @@ func (s *Storage) NewUserBatch(userID int64, batchSize int) (jobs model.JobList,
 	return s.fetchBatchRows(fmt.Sprintf(query, batchSize), userID)
 }
 
+func (s *Storage) NewFrequencyBasedRandomedBatch(batchSize int) (jobs model.JobList, err error) {
+	pollingParsingErrorLimit := config.Opts.PollingParsingErrorLimit()
+	query := `
+		SELECT
+			id,
+			user_id
+		FROM
+			feeds
+		WHERE
+			disabled is false AND
+			CASE WHEN $1 > 0 THEN parsing_error_count < $1 ELSE parsing_error_count >= 0 END
+		ORDER BY checked_at ASC
+	`
+	var (
+		allJobs     model.JobList
+		countWeekly int
+		weight      float64
+	)
+	allJobs, err = s.fetchBatchRows(query, pollingParsingErrorLimit)
+	for _, j := range allJobs {
+		countWeekly, err = s.WeeklyOneHourBeforeAndAfterCount(j.UserID, j.FeedID)
+		if err != nil {
+			return nil, err
+		}
+		weight = float64(countWeekly)
+		if weight == 0 {
+			weight = 1 / 3.0
+		}
+		if isHit(weight / 7.0) {
+			jobs = append(jobs, j)
+
+			if len(jobs) >= batchSize {
+				return
+			}
+		}
+	}
+	return
+}
+
 func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.JobList, err error) {
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
@@ -62,4 +102,8 @@ func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.
 	}
 
 	return jobs, nil
+}
+
+func isHit(probability float64) bool {
+	return rand.Float64() < probability
 }

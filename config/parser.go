@@ -201,6 +201,9 @@ func (p *Parser) parseLines(lines []string) (err error) {
 	if port != "" {
 		p.opts.listenAddr = ":" + port
 	}
+	if p.opts.pollingScheduler == "entry_frequency" {
+		p.opts.pollingFrequency = 15
+	}
 	return nil
 }
 

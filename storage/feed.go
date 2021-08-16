@@ -194,6 +194,33 @@ func (s *Storage) WeeklyFeedEntryCount(userID, feedID int64) (int, error) {
 	return weeklyCount, nil
 }
 
+// WeeklyFeedEntryCount returns the entry number of one hour before and after of past seven days.
+func (s *Storage) WeeklyOneHourBeforeAndAfterCount(userID, feedID int64) (int, error) {
+	query := `
+		SELECT
+			count(*)
+		FROM
+			entries, now() AS n, CAST(n AS date) as d, CAST(n AS time) as t
+		WHERE
+			entries.user_id=$1 AND
+			entries.feed_id=$2 AND
+			entries.published_at::date BETWEEN (d - 7) AND (d - 1) AND
+			entries.published_at::time BETWEEN (t - interval '1 hour') AND (t + interval '1 hour');
+	`
+
+	var count int
+	err := s.db.QueryRow(query, userID, feedID).Scan(&count)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return 0, nil
+	case err != nil:
+		return 0, fmt.Errorf(`store: unable to fetch weekly one hour before and after count for feed #%d: %v`, feedID, err)
+	}
+
+	return count, nil
+}
+
 // FeedByID returns a feed by the ID.
 func (s *Storage) FeedByID(userID, feedID int64) (*model.Feed, error) {
 	builder := NewFeedQueryBuilder(s, userID)

@@ -38,7 +38,15 @@ func Serve(store *storage.Storage, pool *worker.Pool) {
 
 func feedScheduler(store *storage.Storage, pool *worker.Pool, frequency, batchSize int) {
 	for range time.Tick(time.Duration(frequency) * time.Minute) {
-		jobs, err := store.NewBatch(batchSize)
+		var (
+			jobs model.JobList
+			err  error
+		)
+		if config.Opts.PollingScheduler() == model.SchedulerEntryFrequency {
+			jobs, err = store.NewFrequencyBasedRandomedBatch(batchSize)
+		} else {
+			jobs, err = store.NewBatch(batchSize)
+		}
 		if err != nil {
 			logger.Error("[Scheduler:Feed] %v", err)
 		} else {

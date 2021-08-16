@@ -112,17 +112,8 @@ func RefreshFeed(store *storage.Storage, userID, feedID int64) error {
 		return errors.NewLocalizedError(errNotFound, feedID)
 	}
 
-	weeklyEntryCount := 0
-	if config.Opts.PollingScheduler() == model.SchedulerEntryFrequency {
-		var weeklyCountErr error
-		weeklyEntryCount, weeklyCountErr = store.WeeklyFeedEntryCount(userID, feedID)
-		if weeklyCountErr != nil {
-			return weeklyCountErr
-		}
-	}
-
 	originalFeed.CheckedNow()
-	originalFeed.ScheduleNextCheck(weeklyEntryCount)
+	originalFeed.ScheduleNextCheck(0)
 
 	request := client.NewClientWithConfig(originalFeed.FeedURL, config.Opts)
 	request.WithCredentials(originalFeed.Username, originalFeed.Password)
