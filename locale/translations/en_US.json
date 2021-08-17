@@ -278,6 +278,7 @@
     "form.feed.label.apply_filter_to_content": "Apply block/keep rules to content",
     "form.feed.label.fetch_via_proxy": "Fetch via proxy",
     "form.feed.label.disabled": "Do not refresh this feed",
+    "form.feed.label.hide_globally": "Hide entries in global unread list",
     "form.category.label.title": "Title",
     "form.category.hide_globally": "Hide entries in global unread list",
     "form.user.label.username": "Username",

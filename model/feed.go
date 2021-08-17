@@ -53,6 +53,7 @@ type Feed struct {
 	Category                    *Category `json:"category,omitempty"`
 	Entries                     Entries   `json:"entries,omitempty"`
 	Icon                        *FeedIcon `json:"icon"`
+	HideGlobally                bool      `json:"hide_globally"`
 	UnreadCount                 int       `json:"-"`
 	ReadCount                   int       `json:"-"`
 }
@@ -137,6 +138,7 @@ type FeedCreationRequest struct {
 	RewriteRules                string `json:"rewrite_rules"`
 	BlocklistRules              string `json:"blocklist_rules"`
 	KeeplistRules               string `json:"keeplist_rules"`
+	HideGlobally                bool   `json:"hide_globally"`
 }
 
 // FeedModificationRequest represents the request to update a feed.
@@ -159,6 +161,7 @@ type FeedModificationRequest struct {
 	AllowSelfSignedCertificates *bool   `json:"allow_self_signed_certificates"`
 	ApplyFilterToContent        *bool   `json:"apply_filter_to_content"`
 	FetchViaProxy               *bool   `json:"fetch_via_proxy"`
+	HideGlobally                *bool   `json:"hide_globally"`
 }
 
 // Patch updates a feed with modified values.
@@ -229,6 +232,10 @@ func (f *FeedModificationRequest) Patch(feed *Feed) {
 
 	if f.FetchViaProxy != nil {
 		feed.FetchViaProxy = *f.FetchViaProxy
+	}
+
+	if f.HideGlobally != nil {
+		feed.HideGlobally = *f.HideGlobally
 	}
 }
 

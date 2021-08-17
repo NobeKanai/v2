@@ -59,6 +59,7 @@ func (h *handler) showUnreadEntryPage(w http.ResponseWriter, r *http.Request) {
 
 	entryPaginationBuilder := storage.NewEntryPaginationBuilder(h.store, user.ID, entry.ID, user.EntryDirection)
 	entryPaginationBuilder.WithUnreadBefore(*unreadBefore)
+	entryPaginationBuilder.WithGloballyVisible()
 	prevEntry, nextEntry, err := entryPaginationBuilder.Entries()
 	if err != nil {
 		html.ServerError(w, r, err)

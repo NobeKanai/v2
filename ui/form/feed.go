@@ -31,6 +31,8 @@ type FeedForm struct {
 	ApplyFilterToContent        bool
 	FetchViaProxy               bool
 	Disabled                    bool
+	HideGlobally                bool
+	CategoryHidden              bool // Category has "hide_globally"
 }
 
 // Merge updates the fields of the given feed.
@@ -55,6 +57,7 @@ func (f FeedForm) Merge(feed *model.Feed) *model.Feed {
 	feed.ApplyFilterToContent = f.ApplyFilterToContent
 	feed.FetchViaProxy = f.FetchViaProxy
 	feed.Disabled = f.Disabled
+	feed.HideGlobally = f.HideGlobally
 	return feed
 }
 
@@ -83,5 +86,6 @@ func NewFeedForm(r *http.Request) *FeedForm {
 		ApplyFilterToContent:        r.FormValue("apply_filter_to_content") == "1",
 		FetchViaProxy:               r.FormValue("fetch_via_proxy") == "1",
 		Disabled:                    r.FormValue("disabled") == "1",
+		HideGlobally:                r.FormValue("hide_globally") == "1",
 	}
 }

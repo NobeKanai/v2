@@ -278,6 +278,7 @@
     "form.feed.label.apply_filter_to_content": "Pas blokkerings- / bewaarregels toe op inhoud",
     "form.feed.label.fetch_via_proxy": "Ophalen via proxy",
     "form.feed.label.disabled": "Vernieuw deze feed niet",
+    "form.feed.label.hide_globally": "Verberg items in de globale ongelezen lijst",
     "form.category.label.title": "Naam",
     "form.category.hide_globally": "Verberg items in de globale ongelezen lijst",
     "form.user.label.username": "Gebruikersnaam",

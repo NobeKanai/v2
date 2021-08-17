@@ -285,10 +285,11 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 			ignore_http_cache,
 			allow_self_signed_certificates,
 			apply_filter_to_content,
-			fetch_via_proxy
+			fetch_via_proxy,
+			hide_globally
 		)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
 		RETURNING
 			id
 	`
@@ -315,6 +316,7 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 		feed.AllowSelfSignedCertificates,
 		feed.ApplyFilterToContent,
 		feed.FetchViaProxy,
+		feed.HideGlobally,
 	).Scan(&feed.ID)
 	if err != nil {
 		return fmt.Errorf(`store: unable to create feed %q: %v`, feed.FeedURL, err)
@@ -373,9 +375,10 @@ func (s *Storage) UpdateFeed(feed *model.Feed) (err error) {
 			ignore_http_cache=$21,
 			allow_self_signed_certificates=$22,
 			apply_filter_to_content=$23,
-			fetch_via_proxy=$24
+			fetch_via_proxy=$24,
+			hide_globally=$25
 		WHERE
-			id=$25 AND user_id=$26
+			id=$26 AND user_id=$27
 	`
 	_, err = s.db.Exec(query,
 		feed.FeedURL,
@@ -402,6 +405,7 @@ func (s *Storage) UpdateFeed(feed *model.Feed) (err error) {
 		feed.AllowSelfSignedCertificates,
 		feed.ApplyFilterToContent,
 		feed.FetchViaProxy,
+		feed.HideGlobally,
 		feed.ID,
 		feed.UserID,
 	)
