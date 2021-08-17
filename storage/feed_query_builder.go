@@ -167,8 +167,10 @@ func (f *FeedQueryBuilder) GetFeeds() (model.Feeds, error) {
 			f.apply_filter_to_content,
 			f.fetch_via_proxy,
 			f.disabled,
+			f.hide_globally,
 			f.category_id,
 			c.title as category_title,
+			c.hide_globally as category_hidden,
 			fi.icon_id,
 			u.timezone
 		FROM
@@ -228,8 +230,10 @@ func (f *FeedQueryBuilder) GetFeeds() (model.Feeds, error) {
 			&feed.ApplyFilterToContent,
 			&feed.FetchViaProxy,
 			&feed.Disabled,
+			&feed.HideGlobally,
 			&feed.Category.ID,
 			&feed.Category.Title,
+			&feed.Category.HideGlobally,
 			&iconID,
 			&tz,
 		)

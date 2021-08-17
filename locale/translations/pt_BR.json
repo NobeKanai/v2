@@ -278,6 +278,7 @@
     "form.feed.label.apply_filter_to_content": "Aplicar regras de bloqueio / manutenção ao conteúdo",
     "form.feed.label.disabled": "Não atualizar esta fonte",
     "form.feed.label.fetch_via_proxy": "Buscar via proxy",
+    "form.feed.label.hide_globally": "Ocultar entradas na lista global não lida",
     "form.category.label.title": "Título",
     "form.category.hide_globally": "Ocultar entradas na lista global não lida",
     "form.user.label.username": "Nome de usuário",

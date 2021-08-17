@@ -278,6 +278,7 @@
     "form.feed.label.apply_filter_to_content": "Applica il blocco / mantieni le regole al contenuto",
     "form.feed.label.fetch_via_proxy": "Recuperare tramite proxy",
     "form.feed.label.disabled": "Non aggiornare questo feed",
+    "form.feed.label.hide_globally": "Nascondere le voci nella lista globale dei non letti",
     "form.category.label.title": "Titolo",
     "form.category.hide_globally": "Nascondere le voci nella lista globale dei non letti",
     "form.user.label.username": "Nome utente",
