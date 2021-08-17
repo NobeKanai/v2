@@ -552,14 +552,14 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		_, err = tx.Exec(`
-			ALTER TABLE feeds ADD COLUMN hide_globally boolean not null default false
+			ALTER TABLE feeds ADD COLUMN created_at timestamp with time zone not null default now();
+			UPDATE feeds SET created_at = (now() - interval '7 day');
 		`)
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
 		_, err = tx.Exec(`
-			ALTER TABLE feeds ADD COLUMN created_at timestamp with time zone not null default now();
-			UPDATE feeds SET created_at = (now() - interval '7 day');
+			ALTER TABLE feeds ADD COLUMN hide_globally boolean not null default false
 		`)
 		return err
 	},

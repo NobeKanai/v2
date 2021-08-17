@@ -245,6 +245,23 @@ func (s *Storage) FeedAgeDays(userID, feedID int64) (int, error) {
 	return count, nil
 }
 
+// FeedHoursSinceLastCheck returns how many hours have passed since the last update.
+func (s *Storage) FeedHoursSinceLastCheck(userID, feedID int64) (float64, error) {
+	query := `SELECT EXTRACT(EPOCH FROM now()-checked_at)/3600 FROM feeds WHERE user_id=$1 AND id=$2;`
+
+	var count float64
+	err := s.db.QueryRow(query, userID, feedID).Scan(&count)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return 0, nil
+	case err != nil:
+		return 0, fmt.Errorf(`store: unable to fetch feed hours since last check #%d: %v`, feedID, err)
+	}
+
+	return count, nil
+}
+
 // FeedByID returns a feed by the ID.
 func (s *Storage) FeedByID(userID, feedID int64) (*model.Feed, error) {
 	builder := NewFeedQueryBuilder(s, userID)

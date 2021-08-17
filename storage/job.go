@@ -102,13 +102,19 @@ func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.
 }
 
 func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
+	const gradient float64 = 1 / 18.0
+	var weight float64 = 1 / 3.0
+
 	countWeekly, err := s.WeeklyFeedOneHourBeforeAndAfterCount(j.UserID, j.FeedID)
 	if err != nil {
 		return 0, err
 	}
-	weight := float64(countWeekly)
-	if weight == 0 {
-		weight = 1 / 3.0
+	if countWeekly != 0 {
+		hours, err := s.FeedHoursSinceLastCheck(j.UserID, j.FeedID)
+		if err != nil {
+			return 0, err
+		}
+		weight = float64(countWeekly) + gradient*hours
 	}
 
 	feedAge, err := s.FeedAgeDays(j.UserID, j.FeedID)
