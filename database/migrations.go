@@ -550,4 +550,11 @@ var migrations = []func(tx *sql.Tx) error{
 		`)
 		return err
 	},
+	func(tx *sql.Tx) (err error) {
+		_, err = tx.Exec(`
+			ALTER TABLE feeds ADD COLUMN created_at timestamp with time zone not null default now();
+			UPDATE feeds SET created_at = (now() - interval '7 day');
+		`)
+		return err
+	},
 }

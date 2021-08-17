@@ -6,6 +6,7 @@ package storage // import "miniflux.app/storage"
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 
 	"miniflux.app/config"
@@ -61,20 +62,16 @@ func (s *Storage) NewFrequencyBasedRandomedBatch(batchSize int) (jobs model.JobL
 	`
 	var (
 		allJobs     model.JobList
-		countWeekly int
-		weight      float64
+		probability float64
 	)
 	allJobs, err = s.fetchBatchRows(query, pollingParsingErrorLimit)
 	for _, j := range allJobs {
-		countWeekly, err = s.WeeklyOneHourBeforeAndAfterCount(j.UserID, j.FeedID)
+		probability, err = s.feedRefreshProbability(&j)
 		if err != nil {
 			return nil, err
 		}
-		weight = float64(countWeekly)
-		if weight == 0 {
-			weight = 1 / 3.0
-		}
-		if isHit(weight / 7.0) {
+
+		if isHit(probability) {
 			jobs = append(jobs, j)
 
 			if len(jobs) >= batchSize {
@@ -102,6 +99,27 @@ func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.
 	}
 
 	return jobs, nil
+}
+
+func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
+	countWeekly, err := s.WeeklyFeedOneHourBeforeAndAfterCount(j.UserID, j.FeedID)
+	if err != nil {
+		return 0, err
+	}
+	weight := float64(countWeekly)
+	if weight == 0 {
+		weight = 1 / 3.0
+	}
+
+	feedAge, err := s.FeedAgeDays(j.UserID, j.FeedID)
+	if err != nil {
+		return 0, err
+	}
+	feedAgeFloat := float64(feedAge)
+	feedAgeFloat = math.Max(1.0, feedAgeFloat)
+	feedAgeFloat = math.Min(7.0, feedAgeFloat)
+
+	return weight / feedAgeFloat, nil
 }
 
 func isHit(probability float64) bool {

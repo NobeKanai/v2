@@ -194,8 +194,8 @@ func (s *Storage) WeeklyFeedEntryCount(userID, feedID int64) (int, error) {
 	return weeklyCount, nil
 }
 
-// WeeklyFeedEntryCount returns the entry number of one hour before and after of past seven days.
-func (s *Storage) WeeklyOneHourBeforeAndAfterCount(userID, feedID int64) (int, error) {
+// WeeklyFeedOneHourBeforeAndAfterCount returns the entry number of one hour before and after of past seven days.
+func (s *Storage) WeeklyFeedOneHourBeforeAndAfterCount(userID, feedID int64) (int, error) {
 	query := `
 		SELECT
 			count(*)
@@ -216,6 +216,30 @@ func (s *Storage) WeeklyOneHourBeforeAndAfterCount(userID, feedID int64) (int, e
 		return 0, nil
 	case err != nil:
 		return 0, fmt.Errorf(`store: unable to fetch weekly one hour before and after count for feed #%d: %v`, feedID, err)
+	}
+
+	return count, nil
+}
+
+// FeedAgeDays returns the entry number of one hour before and after of past seven days.
+func (s *Storage) FeedAgeDays(userID, feedID int64) (int, error) {
+	query := `
+		SELECT
+			EXTRACT(day FROM (now() - feeds.created_at))
+		FROM
+			feeds
+		WHERE
+			user_id=$1 AND id=$2;
+	`
+
+	var count int
+	err := s.db.QueryRow(query, userID, feedID).Scan(&count)
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return 0, nil
+	case err != nil:
+		return 0, fmt.Errorf(`store: unable to fetch feed age days for feed #%d: %v`, feedID, err)
 	}
 
 	return count, nil
