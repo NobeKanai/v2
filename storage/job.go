@@ -115,13 +115,14 @@ func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
+	hours, err := s.FeedHoursSinceLastCheck(j.UserID, j.FeedID)
+	if err != nil {
+		return 0, err
+	}
+
 	if countWeekly != 0 {
-		weight = float64(countWeekly)
+		weight = float64(countWeekly) * (1 + math.Pow(8, hours)/256)
 	} else {
-		hours, err := s.FeedHoursSinceLastCheck(j.UserID, j.FeedID)
-		if err != nil {
-			return 0, err
-		}
 		weight += gradient * hours
 	}
 
