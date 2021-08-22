@@ -103,10 +103,11 @@ func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.
 
 // feedRefreshProbability get the feed's probability that it should be updated based
 // on the update frequency in the past 7 days.
-// When there are new entries two hours before and after the same time in the past week,
-// the probability is that count / 7(can be smaller if feed's age is smaller than 7,
-// but at least 1.0)
+// When there are new entries one hour before and after the same time in the past week,
+// the probability is that count / 7(this 7 can be smaller if feed's age is smaller than
+// 7, but at least 1.0)
 // otherwise it will ensure that the expected value of the probability in four hours is 1.0
+// The longer it has not been updated, the higher the probability of being updated.
 func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
 	const gradient float64 = 5 / 102.0
 	var weight float64 = 1 / 3.0
