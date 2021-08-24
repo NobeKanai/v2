@@ -131,11 +131,10 @@ func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	feedAgeFloat := float64(feedAge)
-	feedAgeFloat = math.Max(1.0, feedAgeFloat)
-	feedAgeFloat = math.Min(7.0, feedAgeFloat)
+	feedAge = math.Max(1.0, feedAge)
+	feedAge = math.Min(7.0, feedAge)
 
-	return weight / feedAgeFloat, nil
+	return weight / feedAge, nil
 }
 
 func isHit(probability float64) bool {

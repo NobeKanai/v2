@@ -29,7 +29,6 @@ type Feed struct {
 	FeedURL                     string    `json:"feed_url"`
 	SiteURL                     string    `json:"site_url"`
 	Title                       string    `json:"title"`
-	CreatedAt                   time.Time `json:"created_at"`
 	CheckedAt                   time.Time `json:"checked_at"`
 	NextCheckAt                 time.Time `json:"next_check_at"`
 	EtagHeader                  string    `json:"etag_header"`

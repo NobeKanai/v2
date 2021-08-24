@@ -221,18 +221,18 @@ func (s *Storage) WeeklyFeedOneHourBeforeAndAfterCount(userID, feedID int64) (in
 	return count, nil
 }
 
-// FeedAgeDays returns the entry number of one hour before and after of past seven days.
-func (s *Storage) FeedAgeDays(userID, feedID int64) (int, error) {
+// FeedAgeDays returns the number of days since the oldest entry of the feed.
+func (s *Storage) FeedAgeDays(userID, feedID int64) (float64, error) {
 	query := `
 		SELECT
-			EXTRACT(day FROM (now() - feeds.created_at))
+			EXTRACT(EPOCH FROM now()-published_at)/86400
 		FROM
-			feeds
-		WHERE
-			user_id=$1 AND id=$2;
+			entries
+		WHERE user_id=$1 AND feed_id=$2 
+		ORDER BY published_at LIMIT 1;
 	`
 
-	var count int
+	var count float64
 	err := s.db.QueryRow(query, userID, feedID).Scan(&count)
 
 	switch {
