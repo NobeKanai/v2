@@ -14,6 +14,8 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"miniflux.app/integration"
+
 	"miniflux.app/config"
 	"miniflux.app/http/client"
 	"miniflux.app/logger"
@@ -52,6 +54,7 @@ func ProcessFeedEntries(store *storage.Storage, feed *model.Feed) {
 				feed.UserAgent,
 				feed.Cookie,
 				feed.AllowSelfSignedCertificates,
+				feed.FetchViaProxy,
 			)
 
 			if config.Opts.HasMetricsCollector() {
@@ -78,6 +81,18 @@ func ProcessFeedEntries(store *storage.Storage, feed *model.Feed) {
 
 		// The sanitizer should always run at the end of the process to make sure unsafe HTML is filtered.
 		entry.Content = sanitizer.Sanitize(entry.URL, entry.Content)
+
+		if entryIsNew {
+			intg, err := store.Integration(feed.UserID)
+			if err != nil {
+				logger.Error("[Processor] Get integrations for user %d failed: %v; the refresh process will go on, but no integrations will run this time.", feed.UserID, err)
+			} else if intg != nil {
+				localEntry := entry
+				go func() {
+					integration.PushEntry(localEntry, intg)
+				}()
+			}
+		}
 
 		updateEntryReadingTime(store, feed, entry, entryIsNew)
 		filteredEntries = append(filteredEntries, entry)
@@ -126,6 +141,7 @@ func ProcessEntryWebPage(feed *model.Feed, entry *model.Entry) error {
 		entry.Feed.UserAgent,
 		entry.Feed.Cookie,
 		feed.AllowSelfSignedCertificates,
+		feed.FetchViaProxy,
 	)
 
 	if config.Opts.HasMetricsCollector() {
