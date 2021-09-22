@@ -386,10 +386,17 @@ func (e *EntryQueryBuilder) buildSorting() string {
 
 	if e.order != "" {
 		parts = append(parts, fmt.Sprintf(`ORDER BY %s`, e.order))
+		if e.direction != "" {
+			parts = append(parts, e.direction)
+		}
+		parts = append(parts, `,`)
+	} else {
+		parts = append(parts, `ORDER BY`)
 	}
 
-	if e.direction != "" {
-		parts = append(parts, e.direction)
+	parts = append(parts, `e.id`)
+	if e.direction != "desc" {
+		parts = append(parts, `desc`)
 	}
 
 	if e.limit > 0 {
