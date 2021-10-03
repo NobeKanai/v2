@@ -63,7 +63,7 @@ func (h *handler) showCategoryEntryPage(w http.ResponseWriter, r *http.Request) 
 		direction = "desc"
 	}
 
-	entryPaginationBuilder := storage.NewEntryPaginationBuilder(h.store, user.ID, entry.ID, direction)
+	entryPaginationBuilder := storage.NewEntryPaginationBuilder(h.store, user.ID, entry.ID, user.EntryOrder, direction)
 	entryPaginationBuilder.WithCategoryID(categoryID)
 	if showOnlyUnread {
 		unreadBefore = request.QueryTimestampParam(r, "unreadBefore")
