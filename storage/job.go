@@ -106,7 +106,7 @@ func (s *Storage) fetchBatchRows(query string, args ...interface{}) (jobs model.
 // When there are new entries one hour before and after the same time in the past week,
 // the probability is that count / 7(this 7 can be smaller if feed's age is smaller than
 // 7, but at least 1.0)
-// otherwise it will ensure that the expected value of the probability in four hours is 1.0
+// otherwise it will ensure the expected value of the probability in four hours is 1.0.
 // The longer it has not been updated, the higher the probability of being updated.
 func (s *Storage) feedRefreshProbability(j *model.Job) (float64, error) {
 	const gradient float64 = 5 / 102.0
