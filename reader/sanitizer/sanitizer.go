@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"miniflux.app/config"
 	"miniflux.app/url"
 
 	"golang.org/x/net/html"
@@ -300,7 +301,6 @@ func isBlockedResource(src string) bool {
 
 func isValidIframeSource(baseURL, src string) bool {
 	whitelist := []string{
-		"https://invidio.us",
 		"//www.youtube.com",
 		"http://www.youtube.com",
 		"https://www.youtube.com",
@@ -323,6 +323,11 @@ func isValidIframeSource(baseURL, src string) bool {
 
 	// allow iframe from same origin
 	if url.Domain(baseURL) == url.Domain(src) {
+		return true
+	}
+
+	// allow iframe from custom invidious instance
+	if config.Opts != nil && config.Opts.InvidiousInstance() == url.Domain(src) {
 		return true
 	}
 
