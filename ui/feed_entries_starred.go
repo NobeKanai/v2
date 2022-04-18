@@ -37,7 +37,7 @@ func (h *handler) showFeedEntriesStarredPage(w http.ResponseWriter, r *http.Requ
 	offset := request.QueryIntParam(r, "offset", 0)
 	builder := h.store.NewEntryQueryBuilder(user.ID)
 	builder.WithFeedID(feed.ID)
-	builder.WithStarred()
+	builder.WithStarred(true)
 	builder.WithoutStatus(model.EntryStatusRemoved)
 	builder.WithOrder(model.DefaultSortingOrder)
 	builder.WithDirection("desc")

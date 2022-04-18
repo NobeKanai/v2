@@ -37,7 +37,7 @@ func (h *handler) showCategoryEntriesStarredPage(w http.ResponseWriter, r *http.
 	offset := request.QueryIntParam(r, "offset", 0)
 	builder := h.store.NewEntryQueryBuilder(user.ID)
 	builder.WithCategoryID(category.ID)
-	builder.WithStarred()
+	builder.WithStarred(true)
 	builder.WithOrder(model.DefaultSortingOrder)
 	builder.WithDirection("desc")
 	builder.WithoutStatus(model.EntryStatusRemoved)
