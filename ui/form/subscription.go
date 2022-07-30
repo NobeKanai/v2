@@ -28,6 +28,7 @@ type SubscriptionForm struct {
 	RewriteRules                string
 	BlocklistRules              string
 	KeeplistRules               string
+	UrlRewriteRules             string
 }
 
 // Validate makes sure the form values are valid.
@@ -46,6 +47,10 @@ func (s *SubscriptionForm) Validate() error {
 
 	if !validator.IsValidRegex(s.KeeplistRules) {
 		return errors.NewLocalizedError("error.feed_invalid_keeplist_rule")
+	}
+
+	if !validator.IsValidRegex(s.UrlRewriteRules) {
+		return errors.NewLocalizedError("error.feed_invalid_urlrewrite_rule")
 	}
 
 	return nil
@@ -73,5 +78,6 @@ func NewSubscriptionForm(r *http.Request) *SubscriptionForm {
 		RewriteRules:                r.FormValue("rewrite_rules"),
 		BlocklistRules:              r.FormValue("blocklist_rules"),
 		KeeplistRules:               r.FormValue("keeplist_rules"),
+		UrlRewriteRules:             r.FormValue("urlrewrite_rules"),
 	}
 }
