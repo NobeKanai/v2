@@ -97,7 +97,7 @@ windows-x86:
 	@ GOOS=windows GOARCH=386 go build -ldflags=$(LD_FLAGS) -o $(APP)-windows-x86 main.go
 
 run:
-	@ LOG_DATE_TIME=1 go run main.go -debug
+	@ LOG_DATE_TIME=1 DEBUG=1 RUN_MIGRATIONS=1 go run main.go
 
 clean:
 	@ rm -f $(APP)-* $(APP) $(APP)*.rpm $(APP)*.deb
@@ -153,7 +153,7 @@ rpm: clean
 		rpmbuild -bb --define "_miniflux_version $(VERSION)" /root/rpmbuild/SPECS/miniflux.spec
 
 debian:
-	@ docker build \
+	@ docker build --load \
 		--build-arg BASE_IMAGE_ARCH=$(DEB_IMG_ARCH) \
 		-t $(DEB_IMG_ARCH)/miniflux-deb-builder \
 		-f packaging/debian/Dockerfile \
