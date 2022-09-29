@@ -101,6 +101,7 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 	var htmlAttrs, attrNames []string
 	var err error
 	var isImageLargerThanLayout bool
+	var isAnchorLink bool
 
 	if tagName == "img" {
 		imgWidth := getIntegerAttributeValue("width", attributes)
@@ -137,6 +138,9 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 				}
 			} else if tagName == "img" && attribute.Key == "src" && isValidDataAttribute(attribute.Val) {
 				value = attribute.Val
+			} else if isAnchor("a", attribute) {
+				value = attribute.Val
+				isAnchorLink = true
 			} else {
 				value, err = url.AbsoluteURL(baseURL, value)
 				if err != nil {
@@ -153,10 +157,12 @@ func sanitizeAttributes(baseURL, tagName string, attributes []html.Attribute) ([
 		htmlAttrs = append(htmlAttrs, fmt.Sprintf(`%s="%s"`, attribute.Key, html.EscapeString(value)))
 	}
 
-	extraAttrNames, extraHTMLAttributes := getExtraAttributes(tagName)
-	if len(extraAttrNames) > 0 {
-		attrNames = append(attrNames, extraAttrNames...)
-		htmlAttrs = append(htmlAttrs, extraHTMLAttributes...)
+	if !isAnchorLink {
+		extraAttrNames, extraHTMLAttributes := getExtraAttributes(tagName)
+		if len(extraAttrNames) > 0 {
+			attrNames = append(attrNames, extraAttrNames...)
+			htmlAttrs = append(htmlAttrs, extraHTMLAttributes...)
+		}
 	}
 
 	return attrNames, strings.Join(htmlAttrs, " ")
@@ -356,60 +362,60 @@ func isValidIframeSource(baseURL, src string) bool {
 }
 
 var tagAllowList = map[string][]string{
-	"a":          {"href", "title"},
+	"img":        {"alt", "title", "src", "srcset", "sizes", "width", "height"},
+	"picture":    {},
+	"audio":      {"src"},
+	"video":      {"poster", "height", "width", "src"},
+	"source":     {"src", "type", "srcset", "sizes", "media"},
+	"dt":         {"id"},
+	"dd":         {"id"},
+	"dl":         {"id"},
+	"table":      {},
+	"caption":    {},
+	"thead":      {},
+	"tfooter":    {},
+	"tr":         {},
+	"td":         {"rowspan", "colspan"},
+	"th":         {"rowspan", "colspan"},
+	"h1":         {"id"},
+	"h2":         {"id"},
+	"h3":         {"id"},
+	"h4":         {"id"},
+	"h5":         {"id"},
+	"h6":         {"id"},
+	"strong":     {},
+	"em":         {},
+	"code":       {},
+	"pre":        {},
+	"blockquote": {},
+	"q":          {"cite"},
+	"p":          {},
+	"ul":         {"id"},
+	"li":         {"id"},
+	"ol":         {"id"},
+	"br":         {},
+	"del":        {},
+	"a":          {"href", "title", "id"},
+	"figure":     {},
+	"figcaption": {},
+	"cite":       {},
+	"time":       {"datetime"},
 	"abbr":       {"title"},
 	"acronym":    {"title"},
-	"audio":      {"src"},
-	"blockquote": {},
-	"br":         {},
-	"caption":    {},
-	"cite":       {},
-	"code":       {},
-	"dd":         {},
-	"del":        {},
+	"wbr":        {},
 	"dfn":        {},
-	"dl":         {},
-	"dt":         {},
-	"em":         {},
-	"figcaption": {},
-	"figure":     {},
-	"h1":         {},
-	"h2":         {},
-	"h3":         {},
-	"h4":         {},
-	"h5":         {},
-	"h6":         {},
-	"iframe":     {"width", "height", "frameborder", "src", "allowfullscreen"},
-	"img":        {"alt", "title", "src", "srcset", "sizes", "width", "height"},
+	"sub":        {},
+	"sup":        {},
+	"var":        {},
+	"samp":       {},
+	"s":          {},
 	"ins":        {},
 	"kbd":        {},
-	"li":         {},
-	"ol":         {},
-	"p":          {},
-	"picture":    {},
-	"pre":        {},
-	"q":          {"cite"},
 	"rp":         {},
 	"rt":         {},
 	"rtc":        {},
 	"ruby":       {},
-	"s":          {},
-	"samp":       {},
-	"source":     {"src", "type", "srcset", "sizes", "media"},
-	"strong":     {},
-	"sub":        {},
-	"sup":        {},
-	"table":      {},
-	"td":         {"rowspan", "colspan"},
-	"tfooter":    {},
-	"th":         {"rowspan", "colspan"},
-	"thead":      {},
-	"time":       {"datetime"},
-	"tr":         {},
-	"ul":         {},
-	"var":        {},
-	"video":      {"poster", "height", "width", "src"},
-	"wbr":        {},
+	"iframe":     {"width", "height", "frameborder", "src", "allowfullscreen"},
 }
 
 func inList(needle string, haystack []string) bool {
@@ -479,6 +485,10 @@ func isValidDataAttribute(value string) bool {
 		}
 	}
 	return false
+}
+
+func isAnchor(tagName string, attribute html.Attribute) bool {
+	return tagName == "a" && attribute.Key == "href" && strings.HasPrefix(attribute.Val, "#")
 }
 
 func isPositiveInteger(value string) bool {
