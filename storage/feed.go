@@ -244,7 +244,7 @@ func (s *Storage) CreateFeed(feed *model.Feed) error {
 			no_media_player
 		)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
 		RETURNING
 			id
 	`
@@ -347,7 +347,7 @@ func (s *Storage) UpdateFeed(feed *model.Feed) (err error) {
 			url_rewrite_rules=$26,
 			no_media_player=$27
 		WHERE
-			id=$27 AND user_id=$28
+			id=$28 AND user_id=$29
 	`
 	_, err = s.db.Exec(query,
 		feed.FeedURL,
