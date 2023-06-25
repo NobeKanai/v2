@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package form // import "miniflux.app/ui/form"
 
@@ -27,6 +26,7 @@ type SettingsForm struct {
 	ShowReadingTime        bool
 	CustomCSS              string
 	EntrySwipe             bool
+	GestureNav             string
 	DisplayMode            string
 	DefaultReadingSpeed    int
 	CJKReadingSpeed        int
@@ -47,6 +47,7 @@ func (s *SettingsForm) Merge(user *model.User) *model.User {
 	user.ShowReadingTime = s.ShowReadingTime
 	user.Stylesheet = s.CustomCSS
 	user.EntrySwipe = s.EntrySwipe
+	user.GestureNav = s.GestureNav
 	user.DisplayMode = s.DisplayMode
 	user.CJKReadingSpeed = s.CJKReadingSpeed
 	user.DefaultReadingSpeed = s.DefaultReadingSpeed
@@ -112,6 +113,7 @@ func NewSettingsForm(r *http.Request) *SettingsForm {
 		ShowReadingTime:        r.FormValue("show_reading_time") == "1",
 		CustomCSS:              r.FormValue("custom_css"),
 		EntrySwipe:             r.FormValue("entry_swipe") == "1",
+		GestureNav:             r.FormValue("gesture_nav"),
 		DisplayMode:            r.FormValue("display_mode"),
 		DefaultReadingSpeed:    int(defaultReadingSpeed),
 		CJKReadingSpeed:        int(cjkReadingSpeed),

@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package client // import "miniflux.app/client"
 
@@ -246,6 +245,12 @@ func (c *Client) CategoryFeeds(categoryID int64) (Feeds, error) {
 // DeleteCategory removes a category.
 func (c *Client) DeleteCategory(categoryID int64) error {
 	return c.request.Delete(fmt.Sprintf("/v1/categories/%d", categoryID))
+}
+
+// RefreshCategory refreshes a category.
+func (c *Client) RefreshCategory(categoryID int64) error {
+	_, err := c.request.Put(fmt.Sprintf("/v1/categories/%d/refresh", categoryID), nil)
+	return err
 }
 
 // Feeds gets all feeds.

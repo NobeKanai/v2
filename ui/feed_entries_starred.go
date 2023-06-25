@@ -39,8 +39,7 @@ func (h *handler) showFeedEntriesStarredPage(w http.ResponseWriter, r *http.Requ
 	builder.WithFeedID(feed.ID)
 	builder.WithStarred(true)
 	builder.WithoutStatus(model.EntryStatusRemoved)
-	builder.WithOrder(model.DefaultSortingOrder)
-	builder.WithDirection("desc")
+	builder.WithSorting(model.DefaultSortingOrder, "DESC")
 	builder.WithOffset(offset)
 	builder.WithLimit(user.EntriesPerPage)
 

@@ -1,6 +1,5 @@
-// Copyright 2017 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package scraper // import "miniflux.app/reader/scraper"
 
@@ -8,6 +7,7 @@ package scraper // import "miniflux.app/reader/scraper"
 // domain => CSS selectors
 var predefinedRules = map[string]string{
 	"bbc.co.uk":            "div.vxp-column--single, div.story-body__inner, ul.gallery-images__list",
+	"blog.cloudflare.com":  "div.post-content",
 	"cbc.ca":               ".story-content",
 	"darkreading.com":      "#article-main:not(header)",
 	"developpez.com":       "div[itemprop=articleBody]",
@@ -19,6 +19,7 @@ var predefinedRules = map[string]string{
 	"heise.de":             "header .article-content__lead, header .article-image, div.article-layout__content.article-content",
 	"igen.fr":              "section.corps",
 	"ikiwiki.iki.fi":       ".page.group",
+	"ilpost.it":            ".entry-content",
 	"ing.dk":               "section.body",
 	"lapresse.ca":          ".amorce, .entry",
 	"lemonde.fr":           "article",

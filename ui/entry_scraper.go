@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package ui // import "miniflux.app/ui"
 
@@ -9,6 +8,7 @@ import (
 
 	"miniflux.app/http/request"
 	"miniflux.app/http/response/json"
+	"miniflux.app/locale"
 	"miniflux.app/model"
 	"miniflux.app/proxy"
 	"miniflux.app/reader/processor"
@@ -64,5 +64,7 @@ func (h *handler) fetchContent(w http.ResponseWriter, r *http.Request) {
 		json.ServerError(w, r, err)
 	}
 
-	json.OK(w, r, map[string]string{"content": proxy.ImageProxyRewriter(h.router, entry.Content)})
+	readingTime := locale.NewPrinter(user.Language).Plural("entry.estimated_reading_time", entry.ReadingTime, entry.ReadingTime)
+
+	json.OK(w, r, map[string]string{"content": proxy.ProxyRewriter(h.router, entry.Content), "reading_time": readingTime})
 }

@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package api // import "miniflux.app/api"
 
@@ -43,6 +42,7 @@ func Serve(router *mux.Router, store *storage.Storage, pool *worker.Pool) {
 	sr.HandleFunc("/categories/{categoryID}", handler.removeCategory).Methods(http.MethodDelete)
 	sr.HandleFunc("/categories/{categoryID}/mark-all-as-read", handler.markCategoryAsRead).Methods(http.MethodPut)
 	sr.HandleFunc("/categories/{categoryID}/feeds", handler.getCategoryFeeds).Methods(http.MethodGet)
+	sr.HandleFunc("/categories/{categoryID}/refresh", handler.refreshCategory).Methods(http.MethodPut)
 	sr.HandleFunc("/categories/{categoryID}/entries", handler.getCategoryEntries).Methods(http.MethodGet)
 	sr.HandleFunc("/categories/{categoryID}/entries/{entryID}", handler.getCategoryEntry).Methods(http.MethodGet)
 	sr.HandleFunc("/discover", handler.discoverSubscriptions).Methods(http.MethodPost)
