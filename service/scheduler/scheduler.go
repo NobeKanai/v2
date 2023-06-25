@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package scheduler // import "miniflux.app/service/scheduler"
 
@@ -39,10 +38,10 @@ func Serve(store *storage.Storage, pool *worker.Pool) {
 func feedScheduler(store *storage.Storage, pool *worker.Pool, frequency, batchSize int) {
 	for range time.Tick(time.Duration(frequency) * time.Minute) {
 		jobs, err := store.NewBatch(batchSize)
+		logger.Info("[Scheduler:Feed] Pushing %d jobs to the queue", len(jobs))
 		if err != nil {
 			logger.Error("[Scheduler:Feed] %v", err)
 		} else {
-			logger.Debug("[Scheduler:Feed] Pushing %d jobs", len(jobs))
 			pool.Push(jobs)
 		}
 	}

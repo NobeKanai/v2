@@ -35,6 +35,12 @@ document.addEventListener("DOMContentLoaded", function () {
         keyboardHandler.on("+", () => goToAddSubscription());
         keyboardHandler.on("#", () => unsubscribeFromFeed());
         keyboardHandler.on("/", (e) => setFocusToSearchInput(e));
+        keyboardHandler.on("a", () => {
+            let enclosureElement = document.querySelector('.entry-enclosures');
+            if (enclosureElement) {
+                enclosureElement.toggleAttribute('open');
+            }
+        });
         keyboardHandler.on("Escape", () => ModalHandler.close());
         keyboardHandler.listen();
     }
@@ -105,5 +111,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
         }
+    });
+
+   // enclosure media player position save & resume
+    const elements = document.querySelectorAll("audio[data-last-position],video[data-last-position]");
+    elements.forEach((element) => {
+        // we set the current time of media players
+        if (element.dataset.lastPosition){ element.currentTime = element.dataset.lastPosition; }
+        element.ontimeupdate = () => handlePlayerProgressionSave(element);
     });
 });

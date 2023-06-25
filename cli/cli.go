@@ -1,6 +1,5 @@
-// Copyright 2018 Frédéric Guillot. All rights reserved.
-// Use of this source code is governed by the Apache 2.0
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 package cli // import "miniflux.app/cli"
 
@@ -12,6 +11,7 @@ import (
 	"miniflux.app/database"
 	"miniflux.app/locale"
 	"miniflux.app/logger"
+	feedHandler "miniflux.app/reader/handler"
 	"miniflux.app/storage"
 	"miniflux.app/ui/static"
 	"miniflux.app/version"
@@ -29,6 +29,7 @@ const (
 	flagConfigFileHelp      = "Load configuration file"
 	flagConfigDumpHelp      = "Print parsed configuration values"
 	flagHealthCheckHelp     = `Perform a health check on the given endpoint (the value "auto" try to guess the health check endpoint).`
+	flagCronjobHelp         = "Run Miniflux as a cronjob to refresh a batch of feeds and exit"
 )
 
 // Parse parses command line arguments.
@@ -46,6 +47,7 @@ func Parse() {
 		flagConfigFile      string
 		flagConfigDump      bool
 		flagHealthCheck     string
+		flagCronjob         bool
 	)
 
 	flag.BoolVar(&flagInfo, "info", false, flagInfoHelp)
@@ -62,6 +64,7 @@ func Parse() {
 	flag.StringVar(&flagConfigFile, "c", "", flagConfigFileHelp)
 	flag.BoolVar(&flagConfigDump, "config-dump", false, flagConfigDumpHelp)
 	flag.StringVar(&flagHealthCheck, "healthcheck", "", flagHealthCheckHelp)
+	flag.BoolVar(&flagCronjob, "cronjob", false, flagCronjobHelp)
 	flag.Parse()
 
 	cfg := config.NewParser()
@@ -186,6 +189,22 @@ func Parse() {
 	// Create admin user and start the daemon.
 	if config.Opts.CreateAdmin() {
 		createAdmin(store)
+	}
+
+	if flagCronjob {
+		jobs, err := store.NewBatch(config.Opts.BatchSize())
+		if err != nil {
+			logger.Error("[Cronjob] %v", err)
+		}
+
+		logger.Info("[Cronjob]] Processing %d jobs", len(jobs))
+
+		for _, job := range jobs {
+			if err := feedHandler.RefreshFeed(store, job.UserID, job.FeedID); err != nil {
+				logger.Error("[Cronjob] Refreshing the feed #%d returned this error: %v", job.FeedID, err)
+			}
+		}
+		return
 	}
 
 	startDaemon(store)
