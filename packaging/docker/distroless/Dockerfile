@@ -4,10 +4,10 @@ ADD . /go/src/app
 WORKDIR /go/src/app
 RUN go build \
     -o miniflux \
-    -ldflags="-s -w -X 'miniflux.app/version.Version=`git describe --tags --abbrev=0`' -X 'miniflux.app/version.Commit=`git rev-parse --short HEAD`' -X 'miniflux.app/version.BuildDate=`date +%FT%T%z`'" \
+    -ldflags="-s -w -X 'miniflux.app/v2/internal/version.Version=`git describe --tags --abbrev=0`' -X 'miniflux.app/v2/internal/version.Commit=`git rev-parse --short HEAD`' -X 'miniflux.app/v2/internal/version.BuildDate=`date +%FT%T%z`'" \
     main.go
 
-FROM gcr.io/distroless/base
+FROM gcr.io/distroless/base:nonroot
 
 LABEL org.opencontainers.image.title=Miniflux
 LABEL org.opencontainers.image.description="Miniflux is a minimalist and opinionated feed reader"
@@ -20,5 +20,4 @@ LABEL org.opencontainers.image.documentation=https://miniflux.app/docs/
 EXPOSE 8080
 ENV LISTEN_ADDR 0.0.0.0:8080
 COPY --from=build /go/src/app/miniflux /usr/bin/miniflux
-USER nonroot:nonroot
 CMD ["/usr/bin/miniflux"]
