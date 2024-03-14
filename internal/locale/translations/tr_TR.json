@@ -329,6 +329,7 @@
     "form.feed.label.apprise_service_urls": "Comma separated list of Apprise service URLs",
     "form.feed.label.ignore_http_cache": "HTTP önbelleğini yoksay",
     "form.feed.label.allow_self_signed_certificates": "Kendinden imzalı veya geçersiz sertifikalara izin ver",
+    "form.feed.label.apply_filter_to_content": "Apply filter to content",
     "form.feed.label.disable_http2": "Disable HTTP/2 to avoid fingerprinting",
     "form.feed.label.fetch_via_proxy": "Proxy ile çek",
     "form.feed.label.disabled": "Bu beslemeyi yenileme",
