@@ -100,7 +100,6 @@
             <label><input type="checkbox" name="crawler" value="1" {{ if .form.Crawler }}checked{{ end }}> {{ t "form.feed.label.crawler" }}</label>
             <label><input type="checkbox" name="ignore_http_cache" value="1" {{ if .form.IgnoreHTTPCache }}checked{{ end }}> {{ t "form.feed.label.ignore_http_cache" }}</label>
             <label><input type="checkbox" name="allow_self_signed_certificates" value="1" {{ if .form.AllowSelfSignedCertificates }}checked{{ end }}> {{ t "form.feed.label.allow_self_signed_certificates" }}</label>
-            <label><input type="checkbox" name="apply_filter_to_content" value="1" {{ if .form.ApplyFilterToContent }}checked{{ end }}> {{ t "form.feed.label.apply_filter_to_content" }}</label>
             <label><input type="checkbox" name="disable_http2" value="1" {{ if .form.DisableHTTP2 }}checked{{ end }}> {{ t "form.feed.label.disable_http2" }}</label>
             {{ if .hasProxyConfigured }}
             <label><input type="checkbox" name="fetch_via_proxy" value="1" {{ if .form.FetchViaProxy }}checked{{ end }}> {{ t "form.feed.label.fetch_via_proxy" }}</label>
@@ -167,6 +166,8 @@
                 </a>
             </div>
             <input type="text" name="urlrewrite_rules" id="form-urlrewrite-rules" value="{{ .form.UrlRewriteRules }}" spellcheck="false">
+
+            <label><input type="checkbox" name="apply_filter_to_content" value="1" {{ if .form.ApplyFilterToContent }}checked{{ end }}> {{ t "form.feed.label.apply_filter_to_content" }}</label>
 
             <div class="buttons">
                 <button type="submit" class="button button-primary" data-label-loading="{{ t "form.submit.saving" }}">{{ t "action.update" }}</button>
