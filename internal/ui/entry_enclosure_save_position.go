@@ -36,7 +36,7 @@ func (h *handler) saveEnclosureProgression(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	json2.Unmarshal(body, &postData)
+	err = json2.Unmarshal(body, &postData)
 	if err != nil {
 		json.ServerError(w, r, err)
 		return
