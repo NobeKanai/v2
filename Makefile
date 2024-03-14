@@ -1,6 +1,6 @@
 APP          := miniflux
-DOCKER_IMAGE := miniflux/miniflux
-VERSION      := $(shell git describe --tags --abbrev=0 2>/dev/null)
+DOCKER_IMAGE := nobekanai/miniflux
+VERSION      := latest
 COMMIT       := $(shell git rev-parse --short HEAD 2>/dev/null)
 BUILD_DATE   := `date +%FT%T%z`
 LD_FLAGS     := "-s -w -X 'miniflux.app/v2/internal/version.Version=$(VERSION)' -X 'miniflux.app/v2/internal/version.Commit=$(COMMIT)' -X 'miniflux.app/v2/internal/version.BuildDate=$(BUILD_DATE)'"
