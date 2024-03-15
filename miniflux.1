@@ -1,37 +1,32 @@
 .\" Manpage for miniflux.
-.TH "MINIFLUX" "1" "August 29, 2022" "\ \&" "\ \&"
+.TH "MINIFLUX" "1" "November 5, 2023" "\ \&" "\ \&"
 
 .SH NAME
 miniflux \- Minimalist and opinionated feed reader
 
 .SH SYNOPSIS
-\fBminiflux\fR [-vic] [-create-admin] [-debug] [-flush-sessions] [-info] [-migrate]
-         [-reset-feed-errors] [-reset-password] [-version] [-config-file]
-         [-config-dump] [-cronjob] [-healthcheck]
+\fBminiflux\fR [-vic] [-config-dump] [-config-file] [-create-admin] [-debug] [-flush-sessions]
+    [-healthcheck] [-info] [-migrate] [-refresh-feeds] [-reset-feed-errors] [-reset-password]
+    [-run-cleanup-tasks] [-version]
 
 .SH DESCRIPTION
 \fBminiflux\fR is a minimalist and opinionated feed reader.
 
 .SH OPTIONS
 .PP
-.B \-cronjob
-.RS 4
-Run Miniflux as a cronjob to refresh a batch of feeds and exit\&.
-.RE
-.PP
-.B \-c
-.RS 4
-Load configuration file\&.
-.RE
-.PP
-.B \-config-file
-.RS 4
-Load configuration file\&.
-.RE
-.PP
 .B \-config-dump
 .RS 4
 Print parsed configuration values. This will include sensitive information like passwords\&.
+.RE
+.PP
+.B \-c /path/to/miniflux.conf
+.RS 4
+Load configuration file\&.
+.RE
+.PP
+.B \-config-file /path/to/miniflux.conf
+.RS 4
+Load configuration file\&.
 .RE
 .PP
 .B \-create-admin
@@ -41,7 +36,14 @@ Create admin user\&.
 .PP
 .B \-debug
 .RS 4
-Show debug logs\&.
+Set log level to debug\&.
+.RE
+.PP
+.B \-export-user-feeds <username>
+.RS 4
+Export user feeds (provide the username as argument)\&.
+.br
+Example: "miniflux -export-user-feeds someone > feeds.xml"\&.
 .RE
 .PP
 .B \-flush-sessions
@@ -49,7 +51,7 @@ Show debug logs\&.
 Flush all sessions (disconnect users)\&.
 .RE
 .PP
-.B \-healthcheck
+.B \-healthcheck <endpoint>
 .RS 4
 Perform a health check on the given endpoint\&.
 .br
@@ -58,17 +60,22 @@ The value "auto" try to guess the health check endpoint\&.
 .PP
 .B \-i
 .RS 4
-Show application information\&.
+Show build information\&.
 .RE
 .PP
 .B \-info
 .RS 4
-Show application information\&.
+Show build information\&.
 .RE
 .PP
 .B \-migrate
 .RS 4
 Run SQL migrations\&.
+.RE
+.PP
+.B \-refresh-feeds
+.RS 4
+Refresh a batch of feeds and exit\&.
 .RE
 .PP
 .B \-reset-feed-errors
@@ -79,6 +86,11 @@ Clear all feed errors for all users\&.
 .B \-reset-password
 .RS 4
 Reset user password\&.
+.RE
+.PP
+.B \-run-cleanup-tasks
+.RS 4
+Run cleanup tasks (delete old sessions and archives old entries)\&.
 .RE
 .PP
 .B \-v
@@ -108,8 +120,9 @@ Environment variables override the values defined in the config file.
 
 .SH ENVIRONMENT
 .TP
-.B DEBUG
-Set the value to 1 to enable debug logs\&.
+.B FETCH_ODYSEE_WATCH_TIME
+Set the value to 1 to scrape video duration from Odysee website and
+use it as a reading time\&.
 .br
 Disabled by default\&.
 .TP
@@ -118,6 +131,11 @@ Set the value to 1 to scrape video duration from YouTube website and
 use it as a reading time\&.
 .br
 Disabled by default\&.
+.TP
+.B YOUTUBE_EMBED_URL_OVERRIDE
+YouTube URL which will be used for embeds\&.
+.br
+Default is https://www.youtube-nocookie.com/embed/\&
 .TP
 .B SERVER_TIMING_HEADER
 Set the value to 1 to enable server-timing headers\&.
@@ -129,6 +147,21 @@ Display the date and time in log messages\&.
 .br
 Disabled by default\&.
 .TP
+.B LOG_FILE
+Supported values are "stderr", "stdout", or a file name\&.
+.br
+Default is "stderr"\&.
+.TP
+.B LOG_FORMAT
+Supported log formats are "text" or "json"\&.
+.br
+Default is "text"\&.
+.TP
+.B LOG_LEVEL
+Supported values are "debug", "info", "warning", or "error"\&.
+.br
+Default is "info"\&.
+.TP
 .B WORKER_POOL_SIZE
 Number of background workers\&.
 .br
@@ -138,6 +171,11 @@ Default is 5 workers\&.
 Refresh interval in minutes for feeds\&.
 .br
 Default is 60 minutes\&.
+.TP
+.B FORCE_REFRESH_INTERVAL
+The minimum interval for manual refresh\&.
+.br
+Default is 30 minutes\&.
 .TP
 .B BATCH_SIZE
 Number of feeds to send to the queue for each interval\&.
@@ -164,6 +202,16 @@ Default is 24 hours\&.
 Minimum interval in minutes for the entry frequency scheduler\&.
 .br
 Default is 5 minutes\&.
+.TP
+.B SCHEDULER_ENTRY_FREQUENCY_FACTOR
+Factor to increase refresh frequency for the entry frequency scheduler\&.
+.br
+Default is 1\&.
+.TP
+.B SCHEDULER_ROUND_ROBIN_MIN_INTERVAL
+Minimum interval in minutes for the round robin scheduler\&.
+.br
+Default is 60 minutes\&.
 .TP
 .B POLLING_PARSING_ERROR_LIMIT
 The maximum number of parsing errors that the program will try before stopping polling a feed. Once the limit is reached, the user must refresh the feed manually. Set to 0 for unlimited.
@@ -469,9 +517,14 @@ Set a custom invidious instance to use\&.
 Default is yewtu.be\&.
 .TP
 .B PROXY_PRIVATE_KEY
-Set a custom custom private key used to sign proxified media url\&.
+Set a custom custom private key used to sign proxified media URL\&.
 .br
 Default is randomly generated at startup\&.
+.TP
+.B WEBAUTHN
+Enable or disable WebAuthn/Passkey authentication\&.
+.br
+Default is disabled\&.
 
 .SH AUTHORS
 .P

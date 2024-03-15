@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright The Miniflux Authors. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package client // import "miniflux.app/client"
+package client // import "miniflux.app/v2/client"
 
 import (
 	"encoding/json"
@@ -30,6 +30,22 @@ func New(endpoint string, credentials ...string) *Client {
 	return &Client{request: &request{endpoint: endpoint, apiKey: credentials[0]}}
 }
 
+// Version returns the version of the Miniflux instance.
+func (c *Client) Version() (*VersionResponse, error) {
+	body, err := c.request.Get("/v1/version")
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	var versionResponse *VersionResponse
+	if err := json.NewDecoder(body).Decode(&versionResponse); err != nil {
+		return nil, fmt.Errorf("miniflux: json error (%v)", err)
+	}
+
+	return versionResponse, nil
+}
+
 // Me returns the logged user information.
 func (c *Client) Me() (*User, error) {
 	body, err := c.request.Get("/v1/me")
@@ -39,8 +55,7 @@ func (c *Client) Me() (*User, error) {
 	defer body.Close()
 
 	var user *User
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&user); err != nil {
+	if err := json.NewDecoder(body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("miniflux: json error (%v)", err)
 	}
 
@@ -56,8 +71,7 @@ func (c *Client) Users() (Users, error) {
 	defer body.Close()
 
 	var users Users
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&users); err != nil {
+	if err := json.NewDecoder(body).Decode(&users); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -73,8 +87,7 @@ func (c *Client) UserByID(userID int64) (*User, error) {
 	defer body.Close()
 
 	var user User
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&user); err != nil {
+	if err := json.NewDecoder(body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -90,8 +103,7 @@ func (c *Client) UserByUsername(username string) (*User, error) {
 	defer body.Close()
 
 	var user User
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&user); err != nil {
+	if err := json.NewDecoder(body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -111,8 +123,7 @@ func (c *Client) CreateUser(username, password string, isAdmin bool) (*User, err
 	defer body.Close()
 
 	var user *User
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&user); err != nil {
+	if err := json.NewDecoder(body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -128,8 +139,7 @@ func (c *Client) UpdateUser(userID int64, userChanges *UserModificationRequest) 
 	defer body.Close()
 
 	var u *User
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&u); err != nil {
+	if err := json.NewDecoder(body).Decode(&u); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -156,8 +166,7 @@ func (c *Client) Discover(url string) (Subscriptions, error) {
 	defer body.Close()
 
 	var subscriptions Subscriptions
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&subscriptions); err != nil {
+	if err := json.NewDecoder(body).Decode(&subscriptions); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -173,8 +182,7 @@ func (c *Client) Categories() (Categories, error) {
 	defer body.Close()
 
 	var categories Categories
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&categories); err != nil {
+	if err := json.NewDecoder(body).Decode(&categories); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -192,8 +200,7 @@ func (c *Client) CreateCategory(title string) (*Category, error) {
 	defer body.Close()
 
 	var category *Category
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&category); err != nil {
+	if err := json.NewDecoder(body).Decode(&category); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -211,8 +218,7 @@ func (c *Client) UpdateCategory(categoryID int64, title string) (*Category, erro
 	defer body.Close()
 
 	var category *Category
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&category); err != nil {
+	if err := json.NewDecoder(body).Decode(&category); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -234,8 +240,7 @@ func (c *Client) CategoryFeeds(categoryID int64) (Feeds, error) {
 	defer body.Close()
 
 	var feeds Feeds
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&feeds); err != nil {
+	if err := json.NewDecoder(body).Decode(&feeds); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -262,8 +267,7 @@ func (c *Client) Feeds() (Feeds, error) {
 	defer body.Close()
 
 	var feeds Feeds
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&feeds); err != nil {
+	if err := json.NewDecoder(body).Decode(&feeds); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -301,8 +305,7 @@ func (c *Client) Feed(feedID int64) (*Feed, error) {
 	defer body.Close()
 
 	var feed *Feed
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&feed); err != nil {
+	if err := json.NewDecoder(body).Decode(&feed); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -322,8 +325,7 @@ func (c *Client) CreateFeed(feedCreationRequest *FeedCreationRequest) (int64, er
 	}
 
 	var r result
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&r); err != nil {
+	if err := json.NewDecoder(body).Decode(&r); err != nil {
 		return 0, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -378,8 +380,7 @@ func (c *Client) FeedIcon(feedID int64) (*FeedIcon, error) {
 	defer body.Close()
 
 	var feedIcon *FeedIcon
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&feedIcon); err != nil {
+	if err := json.NewDecoder(body).Decode(&feedIcon); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -395,8 +396,7 @@ func (c *Client) FeedEntry(feedID, entryID int64) (*Entry, error) {
 	defer body.Close()
 
 	var entry *Entry
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&entry); err != nil {
+	if err := json.NewDecoder(body).Decode(&entry); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -412,8 +412,7 @@ func (c *Client) CategoryEntry(categoryID, entryID int64) (*Entry, error) {
 	defer body.Close()
 
 	var entry *Entry
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&entry); err != nil {
+	if err := json.NewDecoder(body).Decode(&entry); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -429,8 +428,7 @@ func (c *Client) Entry(entryID int64) (*Entry, error) {
 	defer body.Close()
 
 	var entry *Entry
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&entry); err != nil {
+	if err := json.NewDecoder(body).Decode(&entry); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -448,8 +446,7 @@ func (c *Client) Entries(filter *Filter) (*EntryResultSet, error) {
 	defer body.Close()
 
 	var result EntryResultSet
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&result); err != nil {
+	if err := json.NewDecoder(body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -467,8 +464,7 @@ func (c *Client) FeedEntries(feedID int64, filter *Filter) (*EntryResultSet, err
 	defer body.Close()
 
 	var result EntryResultSet
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&result); err != nil {
+	if err := json.NewDecoder(body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -486,8 +482,7 @@ func (c *Client) CategoryEntries(categoryID int64, filter *Filter) (*EntryResult
 	defer body.Close()
 
 	var result EntryResultSet
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&result); err != nil {
+	if err := json.NewDecoder(body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
@@ -505,13 +500,35 @@ func (c *Client) UpdateEntries(entryIDs []int64, status string) error {
 	return err
 }
 
+// UpdateEntry updates an entry.
+func (c *Client) UpdateEntry(entryID int64, entryChanges *EntryModificationRequest) (*Entry, error) {
+	body, err := c.request.Put(fmt.Sprintf("/v1/entries/%d", entryID), entryChanges)
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	var entry *Entry
+	if err := json.NewDecoder(body).Decode(&entry); err != nil {
+		return nil, fmt.Errorf("miniflux: response error (%v)", err)
+	}
+
+	return entry, nil
+}
+
 // ToggleBookmark toggles entry bookmark value.
 func (c *Client) ToggleBookmark(entryID int64) error {
 	_, err := c.request.Put(fmt.Sprintf("/v1/entries/%d/bookmark", entryID), nil)
 	return err
 }
 
-// FetchCounters
+// SaveEntry sends an entry to a third-party service.
+func (c *Client) SaveEntry(entryID int64) error {
+	_, err := c.request.Post(fmt.Sprintf("/v1/entries/%d/save", entryID), nil)
+	return err
+}
+
+// FetchCounters fetches feed counters.
 func (c *Client) FetchCounters() (*FeedCounters, error) {
 	body, err := c.request.Get("/v1/feeds/counters")
 	if err != nil {
@@ -520,12 +537,33 @@ func (c *Client) FetchCounters() (*FeedCounters, error) {
 	defer body.Close()
 
 	var result FeedCounters
-	decoder := json.NewDecoder(body)
-	if err := decoder.Decode(&result); err != nil {
+	if err := json.NewDecoder(body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("miniflux: response error (%v)", err)
 	}
 
 	return &result, nil
+}
+
+// FlushHistory changes all entries with the status "read" to "removed".
+func (c *Client) FlushHistory() error {
+	_, err := c.request.Put("/v1/flush-history", nil)
+	return err
+}
+
+// Icon fetches a feed icon.
+func (c *Client) Icon(iconID int64) (*FeedIcon, error) {
+	body, err := c.request.Get(fmt.Sprintf("/v1/icons/%d", iconID))
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	var feedIcon *FeedIcon
+	if err := json.NewDecoder(body).Decode(&feedIcon); err != nil {
+		return nil, fmt.Errorf("miniflux: response error (%v)", err)
+	}
+
+	return feedIcon, nil
 }
 
 func buildFilterQueryString(path string, filter *Filter) string {
@@ -556,12 +594,28 @@ func buildFilterQueryString(path string, filter *Filter) string {
 			values.Set("after", strconv.FormatInt(filter.After, 10))
 		}
 
-		if filter.AfterEntryID > 0 {
-			values.Set("after_entry_id", strconv.FormatInt(filter.AfterEntryID, 10))
-		}
-
 		if filter.Before > 0 {
 			values.Set("before", strconv.FormatInt(filter.Before, 10))
+		}
+
+		if filter.PublishedAfter > 0 {
+			values.Set("published_after", strconv.FormatInt(filter.PublishedAfter, 10))
+		}
+
+		if filter.PublishedBefore > 0 {
+			values.Set("published_before", strconv.FormatInt(filter.PublishedBefore, 10))
+		}
+
+		if filter.ChangedAfter > 0 {
+			values.Set("changed_after", strconv.FormatInt(filter.ChangedAfter, 10))
+		}
+
+		if filter.ChangedBefore > 0 {
+			values.Set("changed_before", strconv.FormatInt(filter.ChangedBefore, 10))
+		}
+
+		if filter.AfterEntryID > 0 {
+			values.Set("after_entry_id", strconv.FormatInt(filter.AfterEntryID, 10))
 		}
 
 		if filter.BeforeEntryID > 0 {
