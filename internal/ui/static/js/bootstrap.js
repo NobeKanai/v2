@@ -122,8 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         logoElement.addEventListener("keydown", toggleMainMenu);
     }
 
-    onClick(".header nav li", (event) => onClickMainMenuListItem(event));
-
     if ("serviceWorker" in navigator) {
         let scriptElement = document.getElementById("service-worker-script");
         if (scriptElement) {
