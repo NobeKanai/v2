@@ -79,17 +79,6 @@ function toggleMainMenu(event) {
     }
 }
 
-// Handle click events for the main menu (<li> and <a>).
-function onClickMainMenuListItem(event) {
-    const element = event.target;
-
-    if (element.tagName === "A") {
-        window.location.href = element.getAttribute("href");
-    } else {
-        window.location.href = element.querySelector("a").getAttribute("href");
-    }
-}
-
 // Change the button label when the page is loading.
 function handleSubmitButtons() {
     document.querySelectorAll("form").forEach((element) => {
