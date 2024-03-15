@@ -106,11 +106,14 @@ func (s *Storage) NewFrequencyBasedRandomedBatch(batchSize int) (jobs model.JobL
 				e.published_at::date BETWEEN (d - 7) AND (d - 1) AND
 				e.published_at::time BETWEEN (t - interval '1 hour') AND (t + interval '1 hour')
 			) AS range_count,
-			(
-				SELECT EXTRACT(EPOCH FROM now()-e.published_at)/86400
-				FROM entries e
-				WHERE e.user_id = f.user_id AND e.feed_id = f.id 
-				ORDER BY e.published_at LIMIT 1
+			COALESCE(
+				(
+					SELECT EXTRACT(EPOCH FROM now()-e.published_at)/86400
+					FROM entries e
+					WHERE e.user_id = f.user_id AND e.feed_id = f.id 
+					ORDER BY e.published_at LIMIT 1
+				),
+				0
 			) AS age,
 			(
 				SELECT EXTRACT(EPOCH FROM now()-f.checked_at)/3600
