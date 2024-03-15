@@ -146,7 +146,8 @@ docker-images:
 	docker buildx build \
 		--platform linux/amd64,linux/arm64 \
 		--file packaging/docker/alpine/Dockerfile \
-		--tag $(DOCKER_IMAGE):$(VERSION) .
+		--tag $(DOCKER_IMAGE):$(VERSION) \
+		--pull --push .
 
 rpm: clean
 	@ docker build \
