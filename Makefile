@@ -144,10 +144,9 @@ docker-image-distroless:
 
 docker-images:
 	docker buildx build \
-		--platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+		--platform linux/amd64,linux/arm64 \
 		--file packaging/docker/alpine/Dockerfile \
-		--tag $(DOCKER_IMAGE):$(VERSION) \
-		--push .
+		--tag $(DOCKER_IMAGE):$(VERSION) .
 
 rpm: clean
 	@ docker build \
