@@ -237,13 +237,15 @@ func RefreshFeed(store *storage.Storage, userID, feedID int64, forceRefresh bool
 	requestBuilder.WithUsernameAndPassword(originalFeed.Username, originalFeed.Password)
 	requestBuilder.WithUserAgent(originalFeed.UserAgent, config.Opts.HTTPClientUserAgent())
 	requestBuilder.WithCookie(originalFeed.Cookie)
-	requestBuilder.WithETag(originalFeed.EtagHeader)
-	requestBuilder.WithLastModified(originalFeed.LastModifiedHeader)
 	requestBuilder.WithTimeout(config.Opts.HTTPClientTimeout())
 	requestBuilder.WithProxy(config.Opts.HTTPClientProxy())
 	requestBuilder.UseProxy(originalFeed.FetchViaProxy)
 	requestBuilder.IgnoreTLSErrors(originalFeed.AllowSelfSignedCertificates)
 	requestBuilder.DisableHTTP2(originalFeed.DisableHTTP2)
+	if !forceRefresh {
+		requestBuilder.WithETag(originalFeed.EtagHeader)
+		requestBuilder.WithLastModified(originalFeed.LastModifiedHeader)
+	}
 
 	responseHandler := fetcher.NewResponseHandler(requestBuilder.ExecuteRequest(originalFeed.FeedURL))
 	defer responseHandler.Close()
