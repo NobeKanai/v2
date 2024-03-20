@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -162,7 +163,7 @@ func (f *IconFinder) DownloadIcon(iconURL string) (*model.Icon, error) {
 		slog.String("icon_url", iconURL),
 	)
 
-	responseHandler := fetcher.NewResponseHandler(f.requestBuilder.ExecuteRequest(iconURL))
+	responseHandler := fetcher.NewResponseHandler(newIconRequestBuilder(f.requestBuilder, iconURL).ExecuteRequest(iconURL))
 	defer responseHandler.Close()
 
 	if localizedError := responseHandler.LocalizedError(); localizedError != nil {
@@ -181,6 +182,47 @@ func (f *IconFinder) DownloadIcon(iconURL string) (*model.Icon, error) {
 	}
 
 	return icon, nil
+}
+
+func newIconRequestBuilder(requestBuilder *fetcher.RequestBuilder, iconURL string) *fetcher.RequestBuilder {
+	rb := requestBuilder.Copy()
+
+	parsedURL, err := url.Parse(iconURL)
+	if err != nil {
+		slog.Error("Cannot parse icon url when create new icon request builder", slog.String("icon_url", iconURL))
+		return rb
+	}
+
+	host := parsedURL.Hostname()
+
+	// For certain specific websites, their icon images require the addition of a specific `Referer` header in the request header.
+	var specialSitesReferer = map[string]string{
+		"*.sinaimg.cn": "https://weibo.com/",
+		"i.pximg.net":  "https://www.pixiv.net/",
+	}
+
+	for k, v := range specialSitesReferer {
+		matched, err := filepath.Match(k, host)
+		if err != nil {
+			slog.Error("Failed matching site referer",
+				slog.String("host", host),
+				slog.String("rule", k),
+				slog.Any("err", err))
+			continue
+		}
+
+		if matched {
+			slog.Debug("Warp icon request with referer",
+				slog.String("host", host),
+				slog.String("matched_rule", k),
+				slog.String("referer", v))
+
+			rb.WithHeader("Referer", v)
+			break
+		}
+	}
+
+	return rb
 }
 
 func findIconURLsFromHTMLDocument(body io.Reader, contentType string) ([]string, error) {

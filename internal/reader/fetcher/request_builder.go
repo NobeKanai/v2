@@ -36,6 +36,13 @@ func NewRequestBuilder() *RequestBuilder {
 	}
 }
 
+func (r *RequestBuilder) Copy() *RequestBuilder {
+	rb := *r
+	// make sure every fields are deep copied
+	rb.headers = r.headers.Clone()
+	return &rb
+}
+
 func (r *RequestBuilder) WithHeader(key, value string) *RequestBuilder {
 	r.headers.Set(key, value)
 	return r
