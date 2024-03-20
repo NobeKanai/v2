@@ -170,6 +170,8 @@
     "page.keyboard_shortcuts.go_to_feed": "转到源页面",
     "page.keyboard_shortcuts.go_to_previous_page": "上一页",
     "page.keyboard_shortcuts.go_to_next_page": "下一页",
+    "page.keyboard_shortcuts.go_to_bottom_item": "转到底部项目",
+    "page.keyboard_shortcuts.go_to_top_item": "转到顶部项目",
     "page.keyboard_shortcuts.open_item": "打开选定的文章",
     "page.keyboard_shortcuts.open_original": "打开原始链接",
     "page.keyboard_shortcuts.open_original_same_window": "在当前标签页中打开原始链接",
