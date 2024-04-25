@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 )
 
@@ -20,19 +21,16 @@ const (
 )
 
 type RequestBuilder struct {
-	headers          http.Header
-	clientProxyURL   string
-	useClientProxy   bool
-	clientTimeout    int
-	withoutRedirects bool
-	ignoreTLSErrors  bool
-	disableHTTP2     bool
+	headers      http.Header
+	clientConfig clientConfig
 }
 
 func NewRequestBuilder() *RequestBuilder {
 	return &RequestBuilder{
-		headers:       make(http.Header),
-		clientTimeout: defaultHTTPClientTimeout,
+		headers: make(http.Header),
+		clientConfig: clientConfig{
+			clientTimeout: defaultHTTPClientTimeout,
+		},
 	}
 }
 
@@ -86,36 +84,82 @@ func (r *RequestBuilder) WithUsernameAndPassword(username, password string) *Req
 }
 
 func (r *RequestBuilder) WithProxy(proxyURL string) *RequestBuilder {
-	r.clientProxyURL = proxyURL
+	r.clientConfig.clientProxyURL = proxyURL
 	return r
 }
 
 func (r *RequestBuilder) UseProxy(value bool) *RequestBuilder {
-	r.useClientProxy = value
+	r.clientConfig.useClientProxy = value
 	return r
 }
 
 func (r *RequestBuilder) WithTimeout(timeout int) *RequestBuilder {
-	r.clientTimeout = timeout
+	r.clientConfig.clientTimeout = timeout
 	return r
 }
 
 func (r *RequestBuilder) WithoutRedirects() *RequestBuilder {
-	r.withoutRedirects = true
+	r.clientConfig.withoutRedirects = true
 	return r
 }
 
 func (r *RequestBuilder) DisableHTTP2(value bool) *RequestBuilder {
-	r.disableHTTP2 = value
+	r.clientConfig.disableHTTP2 = value
 	return r
 }
 
 func (r *RequestBuilder) IgnoreTLSErrors(value bool) *RequestBuilder {
-	r.ignoreTLSErrors = value
+	r.clientConfig.ignoreTLSErrors = value
 	return r
 }
 
 func (r *RequestBuilder) ExecuteRequest(requestURL string) (*http.Response, error) {
+	client := makeClient(r.clientConfig)
+
+	req, err := http.NewRequest("GET", requestURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header = r.headers
+	req.Header.Set("Accept", defaultAcceptHeader)
+
+	slog.Debug("Making outgoing request", slog.Group("request",
+		slog.String("method", req.Method),
+		slog.String("url", req.URL.String()),
+		slog.Any("headers", req.Header),
+		slog.Bool("without_redirects", r.clientConfig.withoutRedirects),
+		slog.Bool("with_proxy", r.clientConfig.useClientProxy),
+		slog.String("proxy_url", r.clientConfig.clientProxyURL),
+		slog.Bool("ignore_tls_errors", r.clientConfig.ignoreTLSErrors),
+		slog.Bool("disable_http2", r.clientConfig.disableHTTP2),
+	))
+
+	return client.Do(req)
+}
+
+type clientConfig struct {
+	ignoreTLSErrors  bool
+	disableHTTP2     bool
+	useClientProxy   bool
+	withoutRedirects bool
+	clientProxyURL   string
+	clientTimeout    int
+}
+
+var (
+	clientCache = map[clientConfig]*http.Client{}
+	cacheMutex  = &sync.Mutex{}
+)
+
+func makeClient(cfg clientConfig) *http.Client {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
+	if client, ok := clientCache[cfg]; ok {
+		return client
+	}
+
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		// Setting `DialContext` disables HTTP/2, this option forces the transport to try HTTP/2 regardless.
@@ -135,11 +179,11 @@ func (r *RequestBuilder) ExecuteRequest(requestURL string) (*http.Response, erro
 		IdleConnTimeout: 10 * time.Second,
 
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: r.ignoreTLSErrors,
+			InsecureSkipVerify: cfg.ignoreTLSErrors,
 		},
 	}
 
-	if r.disableHTTP2 {
+	if cfg.disableHTTP2 {
 		transport.ForceAttemptHTTP2 = false
 
 		// https://pkg.go.dev/net/http#hdr-HTTP_2
@@ -147,10 +191,10 @@ func (r *RequestBuilder) ExecuteRequest(requestURL string) (*http.Response, erro
 		transport.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
 	}
 
-	if r.useClientProxy && r.clientProxyURL != "" {
-		if proxyURL, err := url.Parse(r.clientProxyURL); err != nil {
+	if cfg.useClientProxy && cfg.clientProxyURL != "" {
+		if proxyURL, err := url.Parse(cfg.clientProxyURL); err != nil {
 			slog.Warn("Unable to parse proxy URL",
-				slog.String("proxy_url", r.clientProxyURL),
+				slog.String("proxy_url", cfg.clientProxyURL),
 				slog.Any("error", err),
 			)
 		} else {
@@ -159,10 +203,10 @@ func (r *RequestBuilder) ExecuteRequest(requestURL string) (*http.Response, erro
 	}
 
 	client := &http.Client{
-		Timeout: time.Duration(r.clientTimeout) * time.Second,
+		Timeout: time.Duration(cfg.clientTimeout) * time.Second,
 	}
 
-	if r.withoutRedirects {
+	if cfg.withoutRedirects {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
@@ -170,25 +214,7 @@ func (r *RequestBuilder) ExecuteRequest(requestURL string) (*http.Response, erro
 
 	client.Transport = transport
 
-	req, err := http.NewRequest("GET", requestURL, nil)
-	if err != nil {
-		return nil, err
-	}
+	clientCache[cfg] = client
 
-	req.Header = r.headers
-	req.Header.Set("Accept", defaultAcceptHeader)
-	req.Header.Set("Connection", "close")
-
-	slog.Debug("Making outgoing request", slog.Group("request",
-		slog.String("method", req.Method),
-		slog.String("url", req.URL.String()),
-		slog.Any("headers", req.Header),
-		slog.Bool("without_redirects", r.withoutRedirects),
-		slog.Bool("with_proxy", r.useClientProxy),
-		slog.String("proxy_url", r.clientProxyURL),
-		slog.Bool("ignore_tls_errors", r.ignoreTLSErrors),
-		slog.Bool("disable_http2", r.disableHTTP2),
-	))
-
-	return client.Do(req)
+	return client
 }
